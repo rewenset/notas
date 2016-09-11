@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>notas</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}"/>
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.5/socket.io.min.js"></script>
+    <script type="text/javascript" charset="utf-8">
+        $(document).ready(function () {
+            var socket = io.connect('http://' + document.domain + ':' + location.port);
+            var date = new Date();
+
+            function timestamp() {
+                var d = new Date();
+                var h = (d.getHours() < 10 ? '0' : '') + d.getHours();
+                var m = (d.getMinutes() < 10 ? '0' : '') + d.getMinutes();
+                var s = (d.getSeconds() < 10 ? '0' : '') + d.getSeconds();
+                return ('[' + h + ':' + m + ':' + s + '] ')
+            }
+
+            $('form#encr').submit(function (event) {
+                encr_data = $('#encr_data').val();
+                encr_mask = $('#encr_mask').val();
+
+                if (encr_mask == '' || encr_data.length * 5 < encr_mask.length) {
+                    socket.emit('encrypt', {msg: encr_data, mask: encr_mask});
+                    $('form#encr')[0].reset();
+
+                } else {
+                    $('#log').prepend('<div class="message msg_err">' + timestamp() + 'Error: <br> Mask is too short.</div>');
+                }
+                return false;
+            });
+
+            $('form#decr').submit(function (event) {
+                socket.emit('decrypt', {data: $('#decr_data').val()});
+                $('form#decr')[0].reset();
+                return false;
+            });
+
+            socket.on('server_encr', function (msg) {
+                $('#log').prepend('<div class="message msg_encr">'
+                        + timestamp()
+                        + 'Encrypted message: <br>'
+                        + msg.encrypted
+                        + '.</div>');
+            });
+
+            socket.on('server_decr', function (msg) {
+                $('#log').prepend('<div class="message msg_decr">'
+                        + timestamp()
+                        + 'Decrypted message: <br>'
+                        + msg.decrypted
+                        + '.</div>');
+            });
+
+        });
+
+    </script>
+</head>
+<body style="text-align: center">
+<div class="main">
+    <div class="header">
+        <h1>notas</h1>
+        <h2><i>Bacon's cipher</i></h2>
+    </div>
+
+    <div class="block">
+        <h3>encryption</h3>
+        <form id="encr" method="POST" action="#">
+            <input type="text" name="encr_data" id="encr_data" placeholder="message to encrypt">
+            <input type="text" name="encr_mask" id="encr_mask" placeholder="mask">
+            <input type="submit" value="encrypt">
+        </form>
+    </div>
+
+    <div class="block">
+        <h3>decryption</h3>
+        <form id="decr" method="POST" action="#">
+            <input type="text" name="decr_data" id="decr_data" placeholder="message to decrypt">
+            <input type="submit" value="decrypt">
+        </form>
+    </div>
+    <div class="block log">
+        <h3>output:</h3>
+        <div id="log"></div>
+    </div>
+
+
+    <div class="footer">
+        About:
+        <br>
+        from Wikipedia:
+        Bacon's cipher or the Baconian cipher is a method of steganography (a method
+        of hiding a secret message as opposed to just a cipher) devised by Francis
+        Bacon in 1605.
+        A message is concealed in the presentation of text, rather than its content.
+        To encode a message, each letter of the plaintext is replaced by a group of
+        five of the letters 'A' or 'B'. This replacement is a binary encoding and is
+        done according to the alphabet of the Baconian cipher.
+        <a href="https://en.wikipedia.org/wiki/Bacon%27s_cipher"> (read more) </a>
+    </div>
+</div>
+
+</body>
+</html>

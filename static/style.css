@@ -1,0 +1,48 @@
+body {
+    margin-left: 15vw;
+    background-color: rgba(236, 237, 228, 0.71);
+}
+
+.main {
+    background-color: white;
+    width: 845px;
+    border-radius: 3px;
+    min-height: 90vh;
+}
+
+.block {
+    width: 800px;
+    padding: 15px;
+    margin: 5px;
+    border-style: dashed;
+    border-color: #7a1f1f;
+    border-width: 2px;
+    overflow-wrap: break-word;
+}
+
+.log {
+    height: 400px;
+    max-height: 400px;
+    overflow-y:scroll;
+}
+
+.footer {
+    padding: 10px
+}
+
+.message {
+    padding: 10px;
+    margin: 5px;
+}
+
+.msg_encr {
+    background-color: rgba(197, 235, 195, 0.6);
+}
+
+.msg_decr {
+    background-color: rgba(183, 200, 181, 0.6);
+}
+
+.msg_err {
+    background-color: rgba(167, 144, 165, 0.61);
+}
